@@ -57,10 +57,18 @@ impl Token {
         }
     }
 
+    pub fn is_zero(&self) -> bool {
+        match self {
+            &Token::Integer(i) => i == 0,
+            &Token::Float(f) => f == 0.0,
+            _ => false
+        }
+    }
+
     pub fn value(&self) -> Option<Float> {
         match self {
-            Token::Integer(i) => Some(i.to_owned() as Float),
-            Token::Float(f) => Some(f.to_owned()),
+            &Token::Integer(i) => Some(i as Float),
+            &Token::Float(f) => Some(f),
             _ => None
         }
     }
