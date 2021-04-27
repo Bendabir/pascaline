@@ -1,5 +1,6 @@
 use super::token::Token;
 use crate::errors::PascalineError;
+use std::fmt;
 
 
 #[derive(Debug)]
@@ -64,5 +65,15 @@ impl<'a> Stack<'a> {
                 &t => Ok(self.stack.push(t))
             }
         }
+    }
+}
+
+impl<'a> fmt::Display for Stack<'a> {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            formatter,
+            "[{}]",
+            self.stack.iter().map(|t| format!("{}", t)).collect::<Vec<String>>().join(", ")
+        )
     }
 }

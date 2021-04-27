@@ -19,31 +19,31 @@ fn main(){
     stack.push(&t1).unwrap();
     stack.push(&t2).unwrap();
 
-    println!("{:?}", stack);
+    println!("{}", stack);
     println!("\t{} elements", stack.size());
 
     stack.push(&t3).unwrap();
 
-    println!("{:?}", stack);
+    println!("{}", stack);
     println!("\t{} elements", stack.size());
 
     stack.push(&t4).unwrap();
 
-    println!("{:?}", stack);
+    println!("{}", stack);
     println!("\t{} elements", stack.size());
 
     stack.push(&t5).unwrap();
 
-    println!("{:?}", stack);
+    println!("{}", stack);
     println!("\t{} elements", stack.size());
 
     stack.push(&t1).unwrap();
 
-    println!("{:?}", stack);
+    println!("{}", stack);
     println!("\t{} elements", stack.size());
 
     stack.push(&t6).unwrap();
 
-    println!("{:?}", stack);
+    println!("{}", stack);
     println!("\t{} elements", stack.size());
 }
