@@ -14,5 +14,9 @@ pub enum PascalineError<'a> {
     #[error("Unexpected type")]
     TypeError,
     #[error("Division by zero is impossible")]
-    ZeroDivisionError
+    ZeroDivisionError,
+    #[error("Computation stack is full")]
+    FullStackError,
+    #[error("Computation stack is empty")]
+    EmptyStackError
 }

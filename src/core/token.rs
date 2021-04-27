@@ -3,20 +3,20 @@ use super::operator::Operator;
 use crate::errors::PascalineError;
 use std::fmt;
 
-#[derive(Debug, PartialEq)]
-pub enum Token {
+#[derive(Debug, PartialEq, Clone, Copy)]
+pub enum Token<'a> {
     Integer(Int),
     Float(Float),
-    Operator(Operator),
+    Operator(&'a Operator),
     Ignored
 }
 
-impl Token {
-    pub fn new_integer(i: Int) -> Token {
+impl<'a> Token<'a> {
+    pub fn new_integer(i: Int) -> Token<'a> {
         Token::Integer(i)
     }
 
-    pub fn new_float(f: Float) -> Token {
+    pub fn new_float(f: Float) -> Token<'a> {
         if f.fract() == 0.0 {
             Token::Integer(f as Int)
         } else {
@@ -28,7 +28,7 @@ impl Token {
         Operator::from_symbol(o).map(|op| Token::Operator(op))
     }
 
-    pub fn new_ignored() -> Token {
+    pub fn new_ignored() -> Token<'a> {
         Token::Ignored
     }
 
@@ -75,7 +75,7 @@ impl Token {
 }
 
 
-impl fmt::Display for Token {
+impl<'a> fmt::Display for Token<'a> {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Token::Integer(i) => write!(formatter, "{}", i),
@@ -94,34 +94,34 @@ mod tests {
 
     #[test]
     fn test_is_ignored() {
-        assert_eq!(Token::new_integer(0).is_ignored(), false);
-        assert_eq!(Token::new_float(0.0).is_ignored(), false);
-        assert_eq!(Token::new_operator(ADD).unwrap().is_ignored(), false);
-        assert_eq!(Token::new_ignored().is_ignored(), true);
+        assert!(!Token::new_integer(0).is_ignored());
+        assert!(!Token::new_float(0.0).is_ignored());
+        assert!(!Token::new_operator(ADD).unwrap().is_ignored());
+        assert!(Token::new_ignored().is_ignored());
     }
 
     #[test]
     fn test_is_legit() {
-        assert_eq!(Token::new_integer(0).is_legit(), true);
-        assert_eq!(Token::new_float(0.0).is_legit(), true);
-        assert_eq!(Token::new_operator(ADD).unwrap().is_legit(), true);
-        assert_eq!(Token::new_ignored().is_legit(), false);
+        assert!(Token::new_integer(0).is_legit());
+        assert!(Token::new_float(0.0).is_legit());
+        assert!(Token::new_operator(ADD).unwrap().is_legit());
+        assert!(!Token::new_ignored().is_legit());
     }
 
     #[test]
     fn tesnumber() {
-        assert_eq!(Token::new_integer(0).is_number(), true);
-        assert_eq!(Token::new_float(0.0).is_number(), true);
-        assert_eq!(Token::new_operator(ADD).unwrap().is_number(), false);
-        assert_eq!(Token::new_ignored().is_number(), false);
+        assert!(Token::new_integer(0).is_number());
+        assert!(Token::new_float(0.0).is_number());
+        assert!(!Token::new_operator(ADD).unwrap().is_number());
+        assert!(!Token::new_ignored().is_number());
     }
 
     #[test]
     fn test_is_operator() {
-        assert_eq!(Token::new_integer(0).is_operator(), false);
-        assert_eq!(Token::new_float(0.0).is_operator(), false);
-        assert_eq!(Token::new_operator(ADD).unwrap().is_operator(), true);
-        assert_eq!(Token::new_ignored().is_operator(), false);
+        assert!(!Token::new_integer(0).is_operator());
+        assert!(!Token::new_float(0.0).is_operator());
+        assert!(Token::new_operator(ADD).unwrap().is_operator());
+        assert!(!Token::new_ignored().is_operator());
     }
 
     #[test]

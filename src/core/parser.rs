@@ -10,7 +10,7 @@ impl Parser {
         text.split_whitespace()
     }
 
-    fn parse_token(&self, token: &str) -> Token {
+    fn parse_token<'a>(&self, token: &'a str) -> Token<'a> {
         // Try to parse as an int, or a float, or a token
         // If not possible, ignore
         // Token is assumed to be clean
@@ -23,7 +23,7 @@ impl Parser {
         }
     }
 
-    pub fn parse(&self, text: &str) -> Vec<Token> {
+    pub fn parse<'a>(&self, text: &'a str) -> Vec<Token<'a>> {
         self
             .tokenize(text)
             .map(|t| self.parse_token(t))

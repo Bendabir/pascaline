@@ -4,7 +4,7 @@ use super::types::Float;
 use crate::errors::PascalineError;
 use std::fmt;
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, PartialEq)]
 pub enum Operator {
     Add,
     Sub,
@@ -12,13 +12,19 @@ pub enum Operator {
     Div
 }
 
+// Declaring operators once
+const ADD_OPERATOR: Operator = Operator::Add;
+const SUB_OPERATOR: Operator = Operator::Sub;
+const MUL_OPERATOR: Operator = Operator::Mul;
+const DIV_OPERATOR: Operator = Operator::Div;
+
 impl Operator {
-    pub fn from_symbol(symbol: &str) -> Result<Operator, PascalineError> {
+    pub fn from_symbol(symbol: &str) -> Result<&Operator, PascalineError> {
         match symbol {
-            ADD => Ok(Operator::Add),
-            SUB => Ok(Operator::Sub),
-            MUL => Ok(Operator::Mul),
-            DIV => Ok(Operator::Div),
+            ADD => Ok(&ADD_OPERATOR),
+            SUB => Ok(&SUB_OPERATOR),
+            MUL => Ok(&MUL_OPERATOR),
+            DIV => Ok(&DIV_OPERATOR),
             s => Err(PascalineError::OperatorSymbolError(s)),
         }
     }
@@ -104,5 +110,20 @@ impl Operator {
 impl fmt::Display for Operator {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         write!(formatter, "{}", self.symbol())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::core::Operator;
+    use crate::core::symbols::ADD;
+    use std::ptr;
+
+    #[test]
+    fn test_singletons() {
+        let op1 = Operator::from_symbol(ADD).unwrap();
+        let op2 = Operator::from_symbol(ADD).unwrap();
+
+        assert!(ptr::eq(op1, op2));
     }
 }
