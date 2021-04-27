@@ -3,7 +3,7 @@ use super::operator::Operator;
 use crate::errors::PascalineError;
 use std::fmt;
 
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub enum Token<'a> {
     Integer(Int),
     Float(Float),

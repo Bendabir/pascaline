@@ -29,7 +29,7 @@ impl Operator {
         }
     }
 
-    pub fn arity(&self) -> u8 {
+    pub fn arity(&self) -> usize {
         match self {
             Operator::Add => 2,
             Operator::Sub => 2,
@@ -47,13 +47,16 @@ impl Operator {
         }
     }
 
-    pub fn operate(&self, operands: &[&Token]) -> Result<Token, PascalineError> {
+    pub fn operate(&self, operands: &Vec<Token>) -> Result<Token, PascalineError> {
+        let nb_operands = operands.len();
+        let arity = self.arity();
+
         // First, check we can unpack enough numbers
-        if operands.len() != self.arity() as usize {
+        if nb_operands != arity {
             Err(PascalineError::ArityError {
                 op: self.symbol(),
-                expected:  self.arity(),
-                got: operands.len() as u8
+                expected: arity,
+                found: nb_operands
             })
         // Then, check we all got numbers
         } else if !Operator::are_numbers(operands) {
@@ -89,16 +92,16 @@ impl Operator {
         }
     }
 
-    fn are_numbers(operands: &[&Token]) -> bool {
+    fn are_numbers(operands: &Vec<Token>) -> bool {
         operands.iter().all(|t| t.is_number())
     }
 
-    fn unpack_one(operands: &[&Token]) -> Float {
+    fn unpack_one(operands: &Vec<Token>) -> Float {
         // Only used once the size has been checked so it shouldn't be an issue
         operands.first().and_then(|t| t.value()).unwrap()
     }
 
-    fn unpack_two(operands: &[&Token]) -> (Float, Float) {
+    fn unpack_two(operands: &Vec<Token>) -> (Float, Float) {
         // Only used once the size has been checked so it shouldn't be an issue
         (
             operands.get(0).and_then(|t| t.value()).unwrap(),

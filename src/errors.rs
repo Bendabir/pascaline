@@ -5,11 +5,11 @@ use thiserror::Error;
 pub enum PascalineError<'a> {
     #[error("Failed to create operator from symbol : '{0}'")]
     OperatorSymbolError(&'a str),
-    #[error("Wrong arity for operator '{op}' (expected : {expected}, got : {got})")]
+    #[error("Not enough values to apply operator '{op}' (expected : {expected}, found : {found})")]
     ArityError {
         op: &'a str,
-        expected: u8,
-        got: u8
+        expected: usize,
+        found: usize
     },
     #[error("Unexpected type")]
     TypeError,
