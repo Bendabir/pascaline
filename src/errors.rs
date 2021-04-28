@@ -20,5 +20,11 @@ pub enum PascalineError<'a> {
     #[error("Computation stack is empty")]
     EmptyStackError,
     #[error("Operation is not implemented yet")]
-    NotImplementedError
+    NotImplementedError,
+    #[error("No last operator to apply")]
+    NoLastOperatorError,
+    // Just a work around for borrowing issues
+    // Using a flag to delay some computation in the code
+    #[error("")]
+    LastOperatorFlag
 }

@@ -6,7 +6,8 @@ use std::fmt;
 
 #[derive(Debug)]
 pub struct Stack<'a> {
-    stack: Vec<Token<'a>>
+    stack: Vec<Token<'a>>,
+    last_op: Option<&'a Operator>
 }
 
 const STACK_CAPACITY: usize = 4096;
@@ -15,7 +16,8 @@ const STACK_CAPACITY: usize = 4096;
 impl<'a> Stack<'a> {
     pub fn new() -> Stack<'a> {
         Stack {
-            stack: Vec::with_capacity(STACK_CAPACITY)
+            stack: Vec::with_capacity(STACK_CAPACITY),
+            last_op: None
         }
     }
 
@@ -39,7 +41,7 @@ impl<'a> Stack<'a> {
             match token {
                 Token::Operator(op) => {
                     // First, check for stack operators
-                    match op {
+                    let result = match op {
                         Operator::Dup => {
                             match self.stack.first() {
                                 Some(&t) => Ok(self.stack.push(t)),
@@ -64,6 +66,14 @@ impl<'a> Stack<'a> {
                             }
                         },
                         Operator::Clear => Ok(self.clear()),
+                        Operator::LastOp => {
+                            // Just push the last op to the stack to handle all the logic
+                            match self.last_op {
+                                None => Err(PascalineError::NoLastOperatorError),
+                                Some(_) => Err(PascalineError::LastOperatorFlag)
+                                // Some(o) => self.push(Token::new_operator(o.symbol()).unwrap())
+                            }
+                        },
                         // Otherwise, apply the operator's logic
                         _ => {
 
@@ -90,6 +100,25 @@ impl<'a> Stack<'a> {
                                     Ok(t) => Ok(self.stack.push(t))
                                 }
                             }
+                        }
+                    };
+
+                    // Check the result before storing the last operator
+                    // If something went bad, just return right away
+                    // Otherwise, store the last op (if not the LASTOP op)
+                    // This a bit of a dirty workaround because I couldn't find any elegant
+                    // solution to avoid borrowing issues when running the recursion earlier
+                    match result {
+                        Err(PascalineError::LastOperatorFlag) => {
+                            // Safe to unwrap because the flag tells us we can apply this operation
+                            // Same for the created token, the operator is sure to be valid
+                            let last_op = self.last_op.unwrap();
+                            self.push(Token::new_operator(last_op.symbol()).unwrap())
+                        },
+                        Err(e) => Err(e),
+                        Ok(v) => {
+                            self.last_op = Some(op);
+                            Ok(v)
                         }
                     }
                 },
