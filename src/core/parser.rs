@@ -24,6 +24,7 @@ impl Parser {
     }
 
     pub fn parse<'a>(&self, text: &'a str) -> Vec<Token<'a>> {
+        // TODO : Force uppercase
         self
             .tokenize(text)
             .map(|t| self.parse_token(t))

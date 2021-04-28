@@ -18,5 +18,7 @@ pub enum PascalineError<'a> {
     #[error("Computation stack is full")]
     FullStackError,
     #[error("Computation stack is empty")]
-    EmptyStackError
+    EmptyStackError,
+    #[error("Operation is not implemented yet")]
+    NotImplementedError
 }
