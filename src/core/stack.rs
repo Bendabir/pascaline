@@ -26,7 +26,7 @@ impl<'a> Stack<'a> {
         self.stack.clear()
     }
 
-    pub fn push(&mut self, token: &'a Token) -> Result<(), PascalineError> {
+    pub fn push(&mut self, token: Token<'a>) -> Result<(), PascalineError> {
         let stack_size = self.stack.len();
 
         // If stack is full, throw error
@@ -36,7 +36,7 @@ impl<'a> Stack<'a> {
             // If the token is an operator, then we need to pop some elements and run the operator
             // Results will be pushed to the stack
             match token {
-                &Token::Operator(op) => {
+                Token::Operator(op) => {
                     let arity = op.arity();
 
                     if stack_size < arity {
@@ -61,10 +61,14 @@ impl<'a> Stack<'a> {
                         }
                     }
                 },
-                &Token::Ignored => Err(PascalineError::TypeError),
-                &t => Ok(self.stack.push(t))
+                Token::Ignored => Err(PascalineError::TypeError),
+                t => Ok(self.stack.push(t))
             }
         }
+    }
+
+    pub fn result(&self) -> Option<&Token> {
+        self.stack.first()
     }
 }
 
