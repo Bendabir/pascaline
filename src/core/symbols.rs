@@ -42,6 +42,8 @@ pub const CLEAR: &str = "CLEAR";
 
 pub const LEFT_PARENTHESIS: &str = "(";
 pub const RIGHT_PARENTHESIS: &str = ")";
+pub const TRUE: &str = "TRUE";
+pub const FALSE: &str = "FALSE";
 
 pub static OPERATORS: &'static [&str] = &[
     ADD,
@@ -89,6 +91,8 @@ pub static OPERATORS: &'static [&str] = &[
 pub static SYMBOLS: &'static [&str] = &[
     LEFT_PARENTHESIS,
     RIGHT_PARENTHESIS,
+    TRUE,
+    FALSE,
     ADD,
     SUB,
     MUL,
