@@ -11,7 +11,7 @@ impl Parser {
         text.split_whitespace()
     }
 
-    fn parse_token<'a>(&self, token: &'a str) -> Token<'a> {
+    fn make_token<'a>(&self, token: &'a str) -> Token<'a> {
         // Try to parse as an int, or a float, or a token
         // If not possible, ignore
         // Token is assumed to be clean
@@ -35,11 +35,9 @@ impl Parser {
 
     pub fn parse<'a>(&self, text: &'a str) -> Vec<Token<'a>> {
         // TODO : Force uppercase
-        self
-            .tokenize(text)
-            .map(|t| self.parse_token(t))
-            .filter(|t| t.is_legit())
-            .collect::<Vec<Token>>()
+        let tokens = self.tokenize(text);
+
+        tokens.map(|t| self.make_token(t)).filter(|t| t.is_legit()).collect::<Vec<Token>>()
     }
 }
 
@@ -88,78 +86,78 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_token_positive_int() {
+    fn test_make_token_positive_int() {
         let p = Parser;
         let token = "42";
-        let parsed = p.parse_token(token);
+        let parsed = p.make_token(token);
         let expected = Token::new_integer(42);
 
         assert_eq!(parsed, expected);
     }
 
     #[test]
-    fn test_parse_token_negative_int() {
+    fn test_make_token_negative_int() {
         let p = Parser;
         let token = "-42";
-        let parsed = p.parse_token(token);
+        let parsed = p.make_token(token);
         let expected = Token::new_integer(-42);
 
         assert_eq!(parsed, expected);
     }
 
     #[test]
-    fn test_parse_token_positive_float() {
+    fn test_make_token_positive_float() {
         let p = Parser;
         let token = "13.37";
-        let parsed = p.parse_token(token);
+        let parsed = p.make_token(token);
         let expected = Token::new_float(13.37);
 
         assert_eq!(parsed, expected);
     }
 
     #[test]
-    fn test_parse_token_negative_float() {
+    fn test_make_token_negative_float() {
         let p = Parser;
         let token = "-13.37";
-        let parsed = p.parse_token(token);
+        let parsed = p.make_token(token);
         let expected = Token::new_float(-13.37);
 
         assert_eq!(parsed, expected);
     }
 
     #[test]
-    fn test_parse_token_operator() {
+    fn test_make_token_operator() {
         let p = Parser;
         let mut token = "+";
-        let mut parsed = p.parse_token(token);
+        let mut parsed = p.make_token(token);
         let mut expected = Token::new_operator(ADD).unwrap();
 
         assert_eq!(parsed, expected);
 
         token = "-";
-        parsed = p.parse_token(token);
+        parsed = p.make_token(token);
         expected = Token::new_operator(SUB).unwrap();
 
         assert_eq!(parsed, expected);
 
         token = "*";
-        parsed = p.parse_token(token);
+        parsed = p.make_token(token);
         expected = Token::new_operator(MUL).unwrap();
 
         assert_eq!(parsed, expected);
 
         token = "/";
-        parsed = p.parse_token(token);
+        parsed = p.make_token(token);
         expected = Token::new_operator(DIV).unwrap();
 
         assert_eq!(parsed, expected);
     }
 
     #[test]
-    fn test_parse_token_ignored() {
+    fn test_make_token_ignored() {
         let p = Parser;
         let token = "text";
-        let parsed = p.parse_token(token);
+        let parsed = p.make_token(token);
         let expected = Token::new_ignored();
 
         assert_eq!(parsed, expected);
