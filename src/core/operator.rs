@@ -247,7 +247,7 @@ impl Operator {
                 found: nb_operands
             })
         // Then, check we all got numbers
-        } else if (arity > 0) && !Operator::are_numbers(operands) {
+        } else if (arity > 0) && !Operator::are_valid(operands) {
             Err(PascalineError::TypeError)
         // Finally, proceed
         } else {
@@ -405,8 +405,8 @@ impl Operator {
         }
     }
 
-    fn are_numbers(operands: &Vec<Token>) -> bool {
-        operands.iter().all(|t| t.is_number())
+    fn are_valid(operands: &Vec<Token>) -> bool {
+        operands.iter().all(|t| t.is_number() || t.is_bool())
     }
 
     fn unpack_one_float(operands: &Vec<Token>) -> Float {
