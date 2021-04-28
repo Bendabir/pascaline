@@ -1,5 +1,6 @@
 use super::token::Token;
 use super::types::{ Int, Float };
+use super::symbols::{ FALSE, TRUE };
 
 #[derive(Debug)]
 pub struct Parser;
@@ -18,7 +19,16 @@ impl Parser {
             Ok(i) => Token::new_integer(i),
             Err(_) => match token.parse::<Float>() {
                 Ok(f) => Token::new_float(f),
-                Err(_) => Token::new_operator(token).unwrap_or(Token::new_ignored()),
+                Err(_) => {
+                    // Cache the value to avoid checking twice
+                    let is_true = token == TRUE;
+
+                    if is_true || (token == FALSE) {
+                        Token::new_bool(is_true)
+                    } else {
+                        Token::new_operator(token).unwrap_or(Token::new_ignored())
+                    }
+                }
             },
         }
     }

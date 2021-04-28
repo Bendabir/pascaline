@@ -240,35 +240,35 @@ impl Operator {
         let arity = self.arity();
 
         // First, check we can unpack enough numbers
-        if nb_operands != arity {
+        if (arity > 0) && (nb_operands != arity) {
             Err(PascalineError::ArityError {
                 op: self.symbol(),
                 expected: arity,
                 found: nb_operands
             })
         // Then, check we all got numbers
-        } else if !Operator::are_numbers(operands) {
+        } else if (arity > 0) && !Operator::are_numbers(operands) {
             Err(PascalineError::TypeError)
         // Finally, proceed
         } else {
             match self {
                 Operator::Add => {
-                    let (op1, op2) = Operator::unpack_two(operands);
+                    let (op1, op2) = Operator::unpack_two_floats(operands);
 
                     Ok(Token::new_float(op1 + op2))
                 },
                 Operator::Sub => {
-                    let (op1, op2) = Operator::unpack_two(operands);
+                    let (op1, op2) = Operator::unpack_two_floats(operands);
 
                     Ok(Token::new_float(op1 - op2))
                 },
                 Operator::Mul => {
-                    let (op1, op2) = Operator::unpack_two(operands);
+                    let (op1, op2) = Operator::unpack_two_floats(operands);
 
                     Ok(Token::new_float(op1 * op2))
                 },
                 Operator::Div => {
-                    let (op1, op2) = Operator::unpack_two(operands);
+                    let (op1, op2) = Operator::unpack_two_floats(operands);
 
                     if op2 == 0.0 {
                         Err(PascalineError::ZeroDivisionError)
@@ -276,19 +276,71 @@ impl Operator {
                         Ok(Token::new_float(op1 / op2))
                     }
                 },
-                Operator::EucDiv => Err(PascalineError::NotImplementedError),
-                Operator::Mod => Err(PascalineError::NotImplementedError),
-                Operator::Pow => Err(PascalineError::NotImplementedError),
-                Operator::Neg => Err(PascalineError::NotImplementedError),
-                Operator::Sin => Err(PascalineError::NotImplementedError),
-                Operator::Cos => Err(PascalineError::NotImplementedError),
-                Operator::Tan => Err(PascalineError::NotImplementedError),
-                Operator::ArcSin => Err(PascalineError::NotImplementedError),
-                Operator::ArcCos => Err(PascalineError::NotImplementedError),
-                Operator::ArcTan => Err(PascalineError::NotImplementedError),
-                Operator::Sqrt => Err(PascalineError::NotImplementedError),
-                Operator::Exp => Err(PascalineError::NotImplementedError),
-                Operator::Ln => Err(PascalineError::NotImplementedError),
+                Operator::EucDiv => {
+                    let (op1, op2) = Operator::unpack_two_floats(operands);
+
+                    Ok(Token::new_float(op1.div_euclid(op2)))
+                },
+                Operator::Mod => {
+                    let (op1, op2) = Operator::unpack_two_floats(operands);
+
+                    Ok(Token::new_float(op1.rem_euclid(op2)))
+                },
+                Operator::Pow => {
+                    let (op1, op2) = Operator::unpack_two_floats(operands);
+
+                    Ok(Token::new_float(op1.powf(op2)))
+                },
+                Operator::Neg => {
+                    let op = Operator::unpack_one_float(operands);
+
+                    Ok(Token::new_float(-op))
+                },
+                Operator::Sin => {
+                    let op = Operator::unpack_one_float(operands);
+
+                    Ok(Token::new_float(op.sin()))
+                },
+                Operator::Cos => {
+                    let op = Operator::unpack_one_float(operands);
+
+                    Ok(Token::new_float(op.cos()))
+                },
+                Operator::Tan => {
+                    let op = Operator::unpack_one_float(operands);
+
+                    Ok(Token::new_float(op.tan()))
+                },
+                Operator::ArcSin => {
+                    let op = Operator::unpack_one_float(operands);
+
+                    Ok(Token::new_float(op.asin()))
+                },
+                Operator::ArcCos => {
+                    let op = Operator::unpack_one_float(operands);
+
+                    Ok(Token::new_float(op.acos()))
+                },
+                Operator::ArcTan => {
+                    let op = Operator::unpack_one_float(operands);
+
+                    Ok(Token::new_float(op.atan()))
+                },
+                Operator::Sqrt => {
+                    let op = Operator::unpack_one_float(operands);
+
+                    Ok(Token::new_float(op.sqrt()))
+                },
+                Operator::Exp => {
+                    let op = Operator::unpack_one_float(operands);
+
+                    Ok(Token::new_float(op.exp()))
+                },
+                Operator::Ln => {
+                    let op = Operator::unpack_one_float(operands);
+
+                    Ok(Token::new_float(op.ln()))
+                },
                 // Operator::Num => Err(PascalineError::NotImplementedError),
                 // Operator::Den => Err(PascalineError::NotImplementedError),
                 // Operator::Complex => Err(PascalineError::NotImplementedError),
@@ -296,15 +348,51 @@ impl Operator {
                 // Operator::Im => Err(PascalineError::NotImplementedError),
                 // Operator::Arg => Err(PascalineError::NotImplementedError),
                 // Operator::Norm => Err(PascalineError::NotImplementedError),
-                Operator::Eq => Err(PascalineError::NotImplementedError),
-                Operator::Neq => Err(PascalineError::NotImplementedError),
-                Operator::Le => Err(PascalineError::NotImplementedError),
-                Operator::Lt => Err(PascalineError::NotImplementedError),
-                Operator::Ge => Err(PascalineError::NotImplementedError),
-                Operator::Gt => Err(PascalineError::NotImplementedError),
-                Operator::And => Err(PascalineError::NotImplementedError),
-                Operator::Or => Err(PascalineError::NotImplementedError),
-                Operator::Not => Err(PascalineError::NotImplementedError),
+                Operator::Eq => {
+                    let (op1, op2) = Operator::unpack_two_floats(operands);
+
+                    Ok(Token::new_bool(op1 == op2))
+                },
+                Operator::Neq => {
+                    let (op1, op2) = Operator::unpack_two_floats(operands);
+
+                    Ok(Token::new_bool(op1 != op2))
+                },
+                Operator::Le => {
+                    let (op1, op2) = Operator::unpack_two_floats(operands);
+
+                    Ok(Token::new_bool(op1 <= op2))
+                },
+                Operator::Lt => {
+                    let (op1, op2) = Operator::unpack_two_floats(operands);
+
+                    Ok(Token::new_bool(op1 < op2))
+                },
+                Operator::Ge => {
+                    let (op1, op2) = Operator::unpack_two_floats(operands);
+
+                    Ok(Token::new_bool(op1 >= op2))
+                },
+                Operator::Gt => {
+                    let (op1, op2) = Operator::unpack_two_floats(operands);
+
+                    Ok(Token::new_bool(op1 > op2))
+                },
+                Operator::And => {
+                    let (op1, op2) = Operator::unpack_two_bools(operands);
+
+                    Ok(Token::new_bool(op1 && op2))
+                },
+                Operator::Or => {
+                    let (op1, op2) = Operator::unpack_two_bools(operands);
+
+                    Ok(Token::new_bool(op1 || op2))
+                },
+                Operator::Not => {
+                    let op = Operator::unpack_one_bool(operands);
+
+                    Ok(Token::new_bool(!op))
+                },
                 Operator::Dup => Err(PascalineError::NotImplementedError),
                 Operator::Drop => Err(PascalineError::NotImplementedError),
                 Operator::Swap => Err(PascalineError::NotImplementedError),
@@ -321,16 +409,29 @@ impl Operator {
         operands.iter().all(|t| t.is_number())
     }
 
-    fn unpack_one(operands: &Vec<Token>) -> Float {
+    fn unpack_one_float(operands: &Vec<Token>) -> Float {
         // Only used once the size has been checked so it shouldn't be an issue
-        operands.first().and_then(|t| t.value()).unwrap()
+        operands.first().and_then(|t| t.as_float()).unwrap()
     }
 
-    fn unpack_two(operands: &Vec<Token>) -> (Float, Float) {
+    fn unpack_one_bool(operands: &Vec<Token>) -> bool {
+        // Only used once the size has been checked so it shouldn't be an issue
+        operands.first().and_then(|t| t.as_bool()).unwrap()
+    }
+
+    fn unpack_two_floats(operands: &Vec<Token>) -> (Float, Float) {
         // Only used once the size has been checked so it shouldn't be an issue
         (
-            operands.get(0).and_then(|t| t.value()).unwrap(),
-            operands.get(1).and_then(|t| t.value()).unwrap()
+            operands.get(0).and_then(|t| t.as_float()).unwrap(),
+            operands.get(1).and_then(|t| t.as_float()).unwrap()
+        )
+    }
+
+    fn unpack_two_bools(operands: &Vec<Token>) -> (bool, bool) {
+        // Only used once the size has been checked so it shouldn't be an issue
+        (
+            operands.get(0).and_then(|t| t.as_bool()).unwrap(),
+            operands.get(1).and_then(|t| t.as_bool()).unwrap()
         )
     }
 }
