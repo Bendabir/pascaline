@@ -393,14 +393,7 @@ impl Operator {
 
                     Ok(Token::new_bool(!op))
                 },
-                Operator::Dup => Err(PascalineError::NotImplementedError),
-                Operator::Drop => Err(PascalineError::NotImplementedError),
-                Operator::Swap => Err(PascalineError::NotImplementedError),
-                Operator::LastOp => Err(PascalineError::NotImplementedError),
-                Operator::LastArgs => Err(PascalineError::NotImplementedError),
-                Operator::Undo => Err(PascalineError::NotImplementedError),
-                Operator::Redo => Err(PascalineError::NotImplementedError),
-                Operator::Clear => Err(PascalineError::NotImplementedError)
+                _ => Err(PascalineError::NotImplementedError)
             }
         }
     }

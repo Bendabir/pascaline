@@ -1,4 +1,5 @@
 use super::token::Token;
+use super::operator::Operator;
 use crate::errors::PascalineError;
 use std::fmt;
 
@@ -37,27 +38,58 @@ impl<'a> Stack<'a> {
             // Results will be pushed to the stack
             match token {
                 Token::Operator(op) => {
-                    let arity = op.arity();
+                    // First, check for stack operators
+                    match op {
+                        Operator::Dup => {
+                            match self.stack.first() {
+                                Some(&t) => Ok(self.stack.push(t)),
+                                None => Err(PascalineError::EmptyStackError)
+                            }
+                        },
+                        Operator::Drop => {
+                            match self.stack.pop() {
+                                Some(_) => Ok(()),
+                                None => Err(PascalineError::EmptyStackError)
+                            }
+                        },
+                        Operator::Swap => {
+                            if stack_size < 2 {
+                                Err(PascalineError::ArityError {
+                                    op: op.symbol(),
+                                    expected: 2,
+                                    found: stack_size
+                                })
+                            } else {
+                                Ok(self.stack.swap(stack_size - 1, stack_size - 2))
+                            }
+                        },
+                        Operator::Clear => Ok(self.clear()),
+                        // Otherwise, apply the operator's logic
+                        _ => {
 
-                    if stack_size < arity {
-                        Err(PascalineError::ArityError {
-                            op: op.symbol(),
-                            expected: arity,
-                            found: stack_size
-                        })
-                    } else {
-                        // Get the operands
-                        let operands = self.stack.split_off(stack_size - arity);
+                            let arity = op.arity();
 
-                        // Try to run the operator
-                        match op.operate(&operands) {
-                            // If it fails, recover the tokens in the stack
-                            Err(e) => {
-                                self.stack.extend(operands);
-                                Err(e)
-                            },
-                            // Otherwise, push the result
-                            Ok(t) => Ok(self.stack.push(t))
+                            if stack_size < arity {
+                                Err(PascalineError::ArityError {
+                                    op: op.symbol(),
+                                    expected: arity,
+                                    found: stack_size
+                                })
+                            } else {
+                                // Get the operands
+                                let operands = self.stack.split_off(stack_size - arity);
+
+                                // Try to run the operator
+                                match op.operate(&operands) {
+                                    // If it fails, recover the tokens in the stack
+                                    Err(e) => {
+                                        self.stack.extend(operands);
+                                        Err(e)
+                                    },
+                                    // Otherwise, push the result
+                                    Ok(t) => Ok(self.stack.push(t))
+                                }
+                            }
                         }
                     }
                 },
